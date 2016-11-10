@@ -42,7 +42,7 @@ Will return
 
 ```php
 $str = "http://www.google.com/page[:1:1:5:]-[:20:5:40:].html";
-$result = StringSequencer::from($str);
+$result = StringSequencer::multi($str);
 ```
 
 Will return
@@ -74,5 +74,25 @@ Will return
       23 => "http://www.google.com/page5-35.html"
       24 => "http://www.google.com/page5-40.html"
     ]
+
+### Formatting
+
+You can also add a sprintf compatible pattern to format the output
+
+```php
+$str = "http://www.google.com/page[:1:1:5:%02d:].html";
+$result = StringSequencer::from($str);
+```
+
+Will return
+
+    array:5 [
+      0 => "http://www.google.com/page01.html"
+      1 => "http://www.google.com/page02.html"
+      2 => "http://www.google.com/page03.html"
+      3 => "http://www.google.com/page04.html"
+      4 => "http://www.google.com/page05.html"
+    ]
+
 
 
