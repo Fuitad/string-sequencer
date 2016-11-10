@@ -42,17 +42,17 @@ class StringSequencer
     /**
      * @var string
      */
-    protected static $regex = '/\[:(?P<start>\d+):(?:(?P<step>\d+):)?(?:(?P<end>\d+):)?(?:(?P<format>[\d\w%]+):)?\]/i';
+    protected static $sequenceRegexBlocks = '/\[:(?P<start>\d+):(?:(?P<step>\d+):)?(?:(?P<end>\d+):)?(?:(?P<format>[\d\w%]+):)?\]/i';
 
     /**
      * @param string $string
      * @return array
      */
-    public static function from($string = false)
+    public static function from($string = false, $blockCount = 1)
     {
         $stringSequencer = new self($string);
 
-        return $stringSequencer->parse()->sequence();
+        return $stringSequencer->parse()->sequence($blockCount);
     }
 
     /**
@@ -65,7 +65,7 @@ class StringSequencer
             throw new InvalidStringPassed;
         }
 
-        $blocksFound = preg_match_all(self::$regex, $string);
+        $blocksFound = preg_match_all(self::$sequenceRegexBlocks, $string);
 
         if (!$blocksFound) {
             return [];
@@ -78,7 +78,7 @@ class StringSequencer
             $newResult = [];
 
             foreach ($result as $str) {
-                $newResult = array_merge($newResult, self::from($str));
+                $newResult = array_merge($newResult, self::from($str, $counter));
             }
 
             $result = $newResult;
@@ -109,7 +109,7 @@ class StringSequencer
      */
     public function parse()
     {
-        if (!preg_match(self::$regex, $this->originalString, $matchedBlocks)) {
+        if (!preg_match(self::$sequenceRegexBlocks, $this->originalString, $matchedBlocks)) {
             throw new SequenceRegexNotMatched;
         }
 
@@ -129,7 +129,7 @@ class StringSequencer
     /**
      * @return array
      */
-    public function sequence()
+    public function sequence($blockCount = 1)
     {
         if (!$this->parsed) {
             $this->parse();
@@ -144,7 +144,13 @@ class StringSequencer
         $counter = $this->start;
 
         while ($counter <= $this->end) {
-            $result[] = $this->str_replace_once($this->replace, sprintf($this->format, $counter), $this->originalString);
+            $replacementString = sprintf($this->format, $counter);
+
+            $resultString = $this->str_replace_once($this->replace, sprintf($this->format, $counter), $this->originalString);
+
+            $resultString = str_replace("[\\${blockCount}]", $replacementString, $resultString);
+
+            $result[] = $resultString;
 
             $counter += $this->step;
         }

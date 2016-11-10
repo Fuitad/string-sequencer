@@ -28,7 +28,7 @@ $str = "http://www.google.com/page[:1:1:5:].html";
 $result = StringSequencer::from($str);
 ```
 
-Will return
+Will return.
 
     array:5 [
       0 => "http://www.google.com/page1.html"
@@ -45,7 +45,7 @@ $str = "http://www.google.com/page[:1:1:5:]-[:20:5:40:].html";
 $result = StringSequencer::multi($str);
 ```
 
-Will return
+Will return.
 
     array:25 [
       0 => "http://www.google.com/page1-20.html"
@@ -77,7 +77,7 @@ Will return
 
 ### Formatting
 
-You can also add a sprintf compatible pattern to format the output
+You can also add a sprintf compatible pattern to format the output.
 
 ```php
 $str = "http://www.google.com/page[:1:1:5:%02d:].html";
@@ -94,5 +94,21 @@ Will return
       4 => "http://www.google.com/page05.html"
     ]
 
+### Back Reference
 
+If you need to have the same iteration done multiple times in a string (versus having different iterations performed on a string), you can use back references. Keep in mind that while the syntax kinda looks like regular expression back references, it is not.
 
+```php
+$str = "http://www.google.com/page[:1:1:5:%02d:]/[\\1].html";
+$result = StringSequencer::from($str);
+```
+
+Will return.
+
+    array:5 [
+      0 => "http://www.google.com/page1/1.html"
+      1 => "http://www.google.com/page2/2.html"
+      2 => "http://www.google.com/page3/3.html"
+      3 => "http://www.google.com/page4/4.html"
+      4 => "http://www.google.com/page5/5.html"
+    ]
